@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aegis - AI Supply Chain Risk Predictor</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="static/css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="logo-area">
+                <div class="logo-icon">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>AEGIS</h1>
+                    <span>Risk Analytics</span>
+                </div>
+            </div>
+            
+            <nav class="nav-menu">
+                <a href="#" class="nav-item active" data-tab="dashboard">
+                    <i class="fa-solid fa-chart-line"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="nav-item" data-tab="suppliers">
+                    <i class="fa-solid fa-handshake"></i>
+                    <span>Suppliers</span>
+                </a>
+                <a href="#" class="nav-item" data-tab="warehouses">
+                    <i class="fa-solid fa-warehouse"></i>
+                    <span>Warehouses</span>
+                </a>
+                <a href="#" class="nav-item" data-tab="shipments">
+                    <i class="fa-solid fa-truck-ramp-box"></i>
+                    <span>Shipments</span>
+                </a>
+                <a href="#" class="nav-item" data-tab="predictor">
+                    <i class="fa-solid fa-brain"></i>
+                    <span>AI Predictor</span>
+                </a>
+                <a href="#" class="nav-item" data-tab="disruptions">
+                    <i class="fa-solid fa-cloud-bolt"></i>
+                    <span>Disruptions</span>
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="model-status">
+                    <div class="status-indicator online"></div>
+                    <div class="status-details">
+                        <p>AI Engine Active</p>
+                        <span>Random Forest v2.4</span>
+                    </div>
+                </div>
+                <button class="btn btn-secondary btn-sm" id="btn-retrain-sidebar">
+                    <i class="fa-solid fa-arrows-rotate"></i> Retrain
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Workspace -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="main-header">
+                <div class="header-title">
+                    <h2 id="current-tab-title">Supply Chain Overview</h2>
+                    <p id="current-tab-subtitle">Real-time status, predictive risks, and mitigation strategies</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-primary" id="btn-add-shipment-header">
+                        <i class="fa-solid fa-plus"></i> New Shipment
+                    </button>
+                    <div class="user-profile">
+                        <img src="https://ui-avatars.com/api/?name=Supply+Manager&background=0F172A&color=38BDF8&bold=true" alt="User Avatar" class="profile-pic">
+                        <div class="user-info">
+                            <h4>Operations Control</h4>
+                            <span>System Admin</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dynamic Tab Views -->
+            <div class="tab-content-container">
+                
+                <!-- 1. DASHBOARD TAB -->
+                <section class="tab-view active" id="tab-dashboard">
+                    <!-- Metrics Cards Grid -->
+                    <div class="metrics-grid">
+                        <div class="metric-card card-glow-blue">
+                            <div class="card-icon blue-bg">
+                                <i class="fa-solid fa-boxes-packing"></i>
+                            </div>
+                            <div class="card-data">
+                                <span class="metric-label">Total Shipments</span>
+                                <h3 class="metric-value" id="stat-total-shipments">--</h3>
+                                <span class="metric-change positive"><i class="fa-solid fa-arrow-up"></i> +12% this month</span>
+                            </div>
+                        </div>
+                        <div class="metric-card card-glow-amber">
+                            <div class="card-icon amber-bg">
+                                <i class="fa-solid fa-clock-rotate-left"></i>
+                            </div>
+                            <div class="card-data">
+                                <span class="metric-label">Delayed Orders</span>
+                                <h3 class="metric-value text-amber" id="stat-delayed-orders">--</h3>
+                                <span class="metric-change warning"><i class="fa-solid fa-triangle-exclamation"></i> Action required</span>
+                            </div>
+                        </div>
+                        <div class="metric-card card-glow-red">
+                            <div class="card-icon red-bg">
+                                <i class="fa-solid fa-triangle-exclamation"></i>
+                            </div>
+                            <div class="card-data">
+                                <span class="metric-label">High-Risk Suppliers</span>
+                                <h3 class="metric-value text-red" id="stat-high-risk-suppliers">--</h3>
+                                <span class="metric-change danger"><i class="fa-solid fa-shield-virus"></i> Critical concern</span>
+                            </div>
+                        </div>
+                        <div class="metric-card card-glow-emerald">
+                            <div class="card-icon emerald-bg">
+                                <i class="fa-solid fa-warehouse"></i>
+                            </div>
+                            <div class="card-data">
+                                <span class="metric-label">Low Stock Alerter</span>
+                                <h3 class="metric-value text-emerald" id="stat-low-stock-warehouses">--</h3>
+                                <span class="metric-change safe"><i class="fa-solid fa-circle-check"></i> Warehouses below safety</span>
+                            </div>
+                        </div>
+                        <div class="metric-card card-glow-indigo">
+                            <div class="card-icon indigo-bg">
+                                <i class="fa-solid fa-cloud-showers-heavy"></i>
+                            </div>
+                            <div class="card-data">
+                                <span class="metric-label">Weather Alerts</span>
+                                <h3 class="metric-value text-indigo" id="stat-weather-alerts">--</h3>
+                                <span class="metric-change warning"><i class="fa-solid fa-cloud"></i> Heavy storms in corridors</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Charts Grid -->
+                    <div class="dashboard-grid">
+                        <div class="grid-card double-width">
+                            <div class="card-header">
+                                <h3>Shipment Delay & Volume Trends</h3>
+                                <p>6-month review of historical and delayed shipments</p>
+                            </div>
+                            <div class="chart-wrapper">
+                                <canvas id="chart-delay-trends"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="grid-card">
+                            <div class="card-header">
+                                <h3>Delivery Success Ratio</h3>
+                                <p>On-time vs delayed completed deliveries</p>
+                            </div>
+                            <div class="chart-wrapper">
+                                <canvas id="chart-delivery-success"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="grid-card">
+                            <div class="card-header">
+                                <h3>Supplier Reliability Benchmark</h3>
+                                <p>Comparative analysis of supplier performance metrics</p>
+                            </div>
+                            <div class="chart-wrapper">
+                                <canvas id="chart-supplier-perf"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="grid-card double-width">
+                            <div class="card-header">
+                                <h3>Active Shipping Route Risk Heatmap</h3>
+                                <p>Calculated average delays and disruption probability across routes</p>
+                            </div>
+                            <div class="route-heatmap-container">
+                                <div class="table-responsive">
+                                    <table class="data-table" id="table-route-heatmap">
+                                        <thead>
+                                            <tr>
+                                                <th>Route Corridor</th>
+                                                <th>Transport Mode</th>
+                                                <th>Trips</th>
+                                                <th>Avg Delay (Days)</th>
+                                                <th>Disruption Rate</th>
+                                                <th>Risk Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <!-- Dynanically populated -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 2. SUPPLIERS TAB -->
+                <section class="tab-view" id="tab-suppliers">
+                    <div class="section-actions-bar">
+                        <h3>Supplier Roster & Risks</h3>
+                        <button class="btn btn-primary btn-icon-text" id="btn-show-add-supplier">
+                            <i class="fa-solid fa-user-plus"></i> Add New Supplier
+                        </button>
+                    </div>
+
+                    <!-- Form Panel (Hidden by default) -->
+                    <div class="form-panel collapse-panel" id="panel-add-supplier">
+                        <div class="panel-header">
+                            <h4>Register New Supplier</h4>
+                            <button class="close-btn" id="btn-close-supplier-form"><i class="fa-solid fa-xmark"></i></button>
+                        </div>
+                        <form id="form-add-supplier" class="grid-form">
+                            <div class="form-group">
+                                <label for="sup-name">Supplier Name*</label>
+                                <input type="text" id="sup-name" required placeholder="e.g. Reliance Logistics Group">
+                            </div>
+                            <div class="form-group">
+                                <label for="sup-email">Contact Email</label>
+                                <input type="email" id="sup-email" placeholder="e.g. supply@reliance.com">
+                            </div>
+                            <div class="form-group">
+                                <label for="sup-phone">Contact Phone</label>
+                                <input type="text" id="sup-phone" placeholder="e.g. +91-22-345678">
+                            </div>
+                            <div class="form-group">
+                                <label for="sup-reliability">Historical Reliability Score (0-100)*</label>
+                                <input type="number" id="sup-reliability" min="1" max="100" value="95" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="sup-delays">Past Delays Ratio (0.00 - 1.00)*</label>
+                                <input type="number" id="sup-delays" min="0" max="1" step="0.01" value="0.05" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="sup-political">Geopolitical Risk Level*</label>
+                                <select id="sup-political" required>
+                                    <option value="Low">Low Risk</option>
+                                    <option value="Medium">Medium Risk</option>
+                                    <option value="High">High Risk</option>
+                                </select>
+                            </div>
+                            <div class="form-actions">
+                                <button type="button" class="btn btn-secondary" id="btn-cancel-supplier">Cancel</button>
+                                <button type="submit" class="btn btn-primary">Save Supplier</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="suppliers-grid" id="suppliers-list">
+                        <!-- Supplier Cards will be injected here -->
+                    </div>
+                </section>
+
+                <!-- 3. WAREHOUSES TAB -->
+                <section class="tab-view" id="tab-warehouses">
+                    <div class="section-actions-bar">
+                        <h3>Warehouse Inventory Hubs</h3>
+                        <div class="btn-group">
+                            <button class="btn btn-secondary" id="btn-show-add-inventory">
+                                <i class="fa-solid fa-dolly"></i> Adjust Stock
+                            </button>
+                            <button class="btn btn-primary" id="btn-show-add-warehouse">
+                                <i class="fa-solid fa-house-chimney-medical"></i> Add Warehouse
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Add Warehouse Form Panel -->
+                    <div class="form-panel collapse-panel" id="panel-add-warehouse">
+                        <div class="panel-header">
+                            <h4>Register Storage Facility</h4>
+                            <button class="close-btn" id="btn-close-warehouse-form"><i class="fa-solid fa-xmark"></i></button>
+                        </div>
+                        <form id="form-add-warehouse" class="grid-form">
+                            <div class="form-group">
+                                <label for="wh-name">Warehouse Name*</label>
+                                <input type="text" id="wh-name" required placeholder="e.g. Pune Central Depot">
+                            </div>
+                            <div class="form-group">
+                                <label for="wh-location">Location Address*</label>
+                                <input type="text" id="wh-location" required placeholder="e.g. Pune, Maharashtra, India">
+                            </div>
+                            <div class="form-group">
+                                <label for="wh-capacity">Storage Capacity (Units)*</label>
+                                <input type="number" id="wh-capacity" required min="1000" placeholder="e.g. 50000">
+                            </div>
+                            <div class="form-group">
+                                <label for="wh-threshold">Min Stock Safety Threshold (Units)*</label>
+                                <input type="number" id="wh-threshold" required min="100" value="1000">
+                            </div>
+                            <div class="form-actions">
+                                <button type="button" class="btn btn-secondary" id="btn-cancel-warehouse">Cancel</button>
+                                <button type="submit" class="btn btn-primary">Save Facility</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Adjust Stock Form Panel -->
+                    <div class="form-panel collapse-panel" id="panel-add-inventory">
+                        <div class="panel-header">
+                            <h4>Update Stock / Log Inventory</h4>
+                            <button class="close-btn" id="btn-close-inventory-form"><i class="fa-solid fa-xmark"></i></button>
+                        </div>
+                        <form id="form-add-inventory" class="grid-form">
+                            <div class="form-group">
+                                <label for="inv-warehouse">Warehouse Location*</label>
+                                <select id="inv-warehouse" required>
+                                    <!-- Dynamic Warehouses -->
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="inv-item">Item Description*</label>
+                                <input type="text" id="inv-item" required placeholder="e.g. Semiconductor Chips (A55)">
+                            </div>
+                            <div class="form-group">
+                                <label for="inv-qty">Stock Quantity*</label>
+                                <input type="number" id="inv-qty" required min="0" placeholder="e.g. 1500">
+                            </div>
+                            <div class="form-group">
+                                <label for="inv-cost">Unit Replacement Cost ($)*</label>
+                                <input type="number" id="inv-cost" required min="0.01" step="0.01" placeholder="e.g. 45.00">
+                            </div>
+                            <div class="form-actions">
+                                <button type="button" class="btn btn-secondary" id="btn-cancel-inventory">Cancel</button>
+                                <button type="submit" class="btn btn-primary">Update Inventory</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="warehouse-layout">
+                        <!-- Warehouses Grid (Left Side) -->
+                        <div class="warehouse-grid" id="warehouses-list">
+                            <!-- Dynamic Warehouse summary cards -->
+                        </div>
+
+                        <!-- Consolidated Inventory Table (Right Side) -->
+                        <div class="inventory-card">
+                            <div class="card-header">
+                                <h3>Consolidated Inventory Matrix</h3>
+                                <p>Comprehensive sku stock availability and warehouse mappings</p>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Item SKU</th>
+                                            <th>Stored Facility</th>
+                                            <th>Quantity Available</th>
+                                            <th>Unit Valuation</th>
+                                            <th>Total Asset Value</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="inventory-table-body">
+                                        <!-- Dynamic items -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 4. SHIPMENTS TAB -->
+                <section class="tab-view" id="tab-shipments">
+                    <div class="section-actions-bar">
+                        <h3>Shipment Logistics Pipeline</h3>
+                        <button class="btn btn-primary" id="btn-show-add-shipment">
+                            <i class="fa-solid fa-truck-loading"></i> Log New Shipment
+                        </button>
+                    </div>
+
+                    <!-- Log Shipment Form Panel -->
+                    <div class="form-panel collapse-panel" id="panel-add-shipment">
+                        <div class="panel-header">
+                            <h4>Log Cargo Transit</h4>
+                            <button class="close-btn" id="btn-close-shipment-form"><i class="fa-solid fa-xmark"></i></button>
+                        </div>
+                        <form id="form-add-shipment" class="grid-form">
+                            <div class="form-group">
+                                <label for="ship-tracking">Tracking Reference (Leave empty for Auto-gen)</label>
+                                <input type="text" id="ship-tracking" placeholder="e.g. TRK-A7B89">
+                            </div>
+                            <div class="form-group">
+                                <label for="ship-supplier">Originating Supplier*</label>
+                                <select id="ship-supplier" required>
+                                    <!-- Dynamic -->
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="ship-warehouse">Destination Warehouse*</label>
+                                <select id="ship-warehouse" required>
+                                    <!-- Dynamic -->
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="ship-origin">Route Origin City*</label>
+                                <input type="text" id="ship-origin" required placeholder="e.g. Pune Hub">
+                            </div>
+                            <div class="form-group">
+                                <label for="ship-dest">Route Destination City*</label>
+                                <input type="text" id="ship-dest" required placeholder="e.g. Delhi Depot">
+                            </div>
+                            <div class="form-group">
+                                <label for="ship-distance">Transit Distance (km)*</label>
+                                <input type="number" id="ship-distance" required min="1" placeholder="e.g. 850">
+                            </div>
+                            <div class="form-group">
+                                <label for="ship-mode">Transport Mode*</label>
+                                <select id="ship-mode" required>
+                                    <option value="Truck">Road Transport (Truck)</option>
+                                    <option value="Rail">Rail Freight (Train)</option>
+                                    <option value="Air">Air Freight (Plane)</option>
+                                    <option value="Sea">Ocean Cargo (Ship)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="ship-weather">Local Weather forecast*</label>
+                                <select id="ship-weather" required>
+                                    <option value="Clear">Clear Sky</option>
+                                    <option value="Light Rain">Light Drizzle / Rain</option>
+                                    <option value="Heavy Rain">Torrential Downpour / Heavy Rain</option>
+                                    <option value="Snow">Snow Accumulation / Blizzard</option>
+                                    <option value="Storm">Severe Wind Storm / Typhoon</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="ship-traffic">Expected Highway Traffic*</label>
+                                <select id="ship-traffic" required>
+                                    <option value="Low">Low Traffic (Smooth Flow)</option>
+                                    <option value="Medium">Moderate Traffic (Minor delays)</option>
+                                    <option value="High">Congested Traffic (Heavy jams)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="ship-fuel">Fuel Market Price ($/Gal)*</label>
+                                <input type="number" id="ship-fuel" min="0.1" step="0.01" value="3.50" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="ship-holiday">Is Holiday / Peak Season?*</label>
+                                <select id="ship-holiday" required>
+                                    <option value="0">Standard Season</option>
+                                    <option value="1">Holiday / Festival Season (Peak Load)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="ship-date">Departure Date*</label>
+                                <input type="date" id="ship-date" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="ship-status">Transit Status*</label>
+                                <select id="ship-status" required>
+                                    <option value="In Transit">In Transit</option>
+                                    <option value="Delivered">Delivered (No Delay)</option>
+                                    <option value="Delayed">Delayed (Stuck/Late)</option>
+                                </select>
+                            </div>
+                            <div class="form-group historical-only" style="display:none;">
+                                <label for="ship-delay-days">Actual Delay (Days)</label>
+                                <input type="number" id="ship-delay-days" min="0" value="0">
+                            </div>
+                            <div class="form-actions">
+                                <button type="button" class="btn btn-secondary" id="btn-cancel-shipment">Cancel</button>
+                                <button type="submit" class="btn btn-primary">Log Cargo</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Shipments Data Table -->
+                    <div class="grid-card full-width">
+                        <div class="table-responsive">
+                            <table class="data-table" id="shipments-table">
+                                <thead>
+                                    <tr>
+                                        <th>Ref Code</th>
+                                        <th>Supplier Name</th>
+                                        <th>Route Corridor</th>
+                                        <th>Distance</th>
+                                        <th>Transport</th>
+                                        <th>Departure</th>
+                                        <th>Status</th>
+                                        <th>Weather</th>
+                                        <th>Traffic</th>
+                                        <th>Delay</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="shipments-table-body">
+                                    <!-- Loaded dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 5. AI PREDICTOR TAB -->
+                <section class="tab-view" id="tab-predictor">
+                    <div class="ai-predictor-layout">
+                        <!-- Left Panel: Parameter Controls -->
+                        <div class="predictor-controls card-glow-indigo">
+                            <div class="card-header">
+                                <h3>AI Simulation Console</h3>
+                                <p>Adjust supply chain parameters below to simulate shipment delay probability, expected durations, and recommended actions.</p>
+                            </div>
+                            <form id="form-ai-predictor" class="vertical-form">
+                                <div class="form-group">
+                                    <label for="pred-supplier">Originating Supplier</label>
+                                    <select id="pred-supplier" required>
+                                        <!-- Dynamic suppliers list -->
+                                    </select>
+                                    <small class="helper-text" id="pred-supplier-meta">Geopolitical & Reliability indicators auto-resolved</small>
+                                </div>
+                                <div class="form-group">
+                                    <label for="pred-mode">Logistics transport Mode</label>
+                                    <select id="pred-mode" required>
+                                        <option value="Truck">Road Freight (Truck)</option>
+                                        <option value="Rail">Rail Transport (Freight Train)</option>
+                                        <option value="Air">Air Freight (Cargo plane)</option>
+                                        <option value="Sea">Maritime Freight (Cargo Ship)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="pred-weather">Forecasted Weather Conditions</label>
+                                    <select id="pred-weather" required>
+                                        <option value="Clear">Clear / Stable</option>
+                                        <option value="Light Rain">Light Rain / Showers</option>
+                                        <option value="Heavy Rain">Heavy Rain / Downpour</option>
+                                        <option value="Snow">Freezing Snow / Ice Accumulation</option>
+                                        <option value="Storm">Severe Gales / Storm cell</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="pred-traffic">Traffic Congestion Index</label>
+                                    <select id="pred-traffic" required>
+                                        <option value="Low">Low Traffic (Smooth Transit)</option>
+                                        <option value="Medium">Medium Traffic (Moderate Delay)</option>
+                                        <option value="High">High Traffic (Gridlocks)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="pred-distance">Calculated Route Distance (km)</label>
+                                    <div class="slider-container">
+                                        <input type="range" id="pred-distance" min="50" max="2500" value="850" class="custom-slider">
+                                        <span class="slider-value" id="pred-distance-val">850 km</span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="pred-fuel">Fuel Market Price Index ($/Gal)</label>
+                                    <div class="slider-container">
+                                        <input type="range" id="pred-fuel" min="2.00" max="6.00" step="0.10" value="3.50" class="custom-slider">
+                                        <span class="slider-value" id="pred-fuel-val">$3.50</span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="pred-holiday">Holiday Peak Loading</label>
+                                    <select id="pred-holiday" required>
+                                        <option value="0">Off-Peak Season (Standard)</option>
+                                        <option value="1">Peak Festive / Holiday Season</option>
+                                    </select>
+                                </div>
+                                
+                                <button type="submit" class="btn btn-primary btn-block" id="btn-predict-risk">
+                                    <i class="fa-solid fa-wand-magic-sparkles"></i> Compute Predictive Risk
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Right Panel: Results & Recommendations -->
+                        <div class="predictor-results">
+                            <!-- Gauge Card -->
+                            <div class="results-grid-top">
+                                <div class="grid-card text-center" id="card-risk-gauge">
+                                    <div class="card-header">
+                                        <h3>Computed Risk Assessment</h3>
+                                    </div>
+                                    <div class="risk-gauge-wrapper">
+                                        <div class="risk-gauge">
+                                            <svg viewBox="0 0 100 100" class="gauge-svg">
+                                                <circle cx="50" cy="50" r="40" class="gauge-background"></circle>
+                                                <circle cx="50" cy="50" r="40" class="gauge-fill" id="gauge-fill-circle" stroke-dasharray="251.2" stroke-dashoffset="251.2"></circle>
+                                            </svg>
+                                            <div class="gauge-text">
+                                                <h2 id="predicted-risk-score">--%</h2>
+                                                <span>Risk Rating</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <h4 class="risk-badge badge-neutral" id="predicted-risk-level">No Simulation Executed</h4>
+                                </div>
+
+                                <div class="results-stats-panel">
+                                    <div class="grid-card metric-item">
+                                        <span class="label">Delay Probability</span>
+                                        <h3 id="predicted-delay-prob">--%</h3>
+                                        <div class="progress-bar-container">
+                                            <div class="progress-bar" id="prob-progress-bar" style="width: 0%"></div>
+                                        </div>
+                                    </div>
+                                    <div class="grid-card metric-item">
+                                        <span class="label">Expected Late Margin</span>
+                                        <h3 id="predicted-delay-days">-- Days</h3>
+                                        <p class="explanation-text">Calculated margin beyond standard transit timeline</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Recommendations Card -->
+                            <div class="grid-card mt-4" id="recommendations-box">
+                                <div class="card-header card-header-ai">
+                                    <div class="header-ai-title">
+                                        <i class="fa-solid fa-gears text-indigo"></i>
+                                        <div>
+                                            <h3>AI-Recommended Actionable Mitigations</h3>
+                                            <p>Optimized options generated to bypass identified risk paths</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="recommendations-body">
+                                    <ul class="recommendation-list" id="recommendation-list-container">
+                                        <li class="reco-placeholder">
+                                            <i class="fa-solid fa-circle-info"></i>
+                                            <p>Awaiting simulation input. Submit parameters in the console to evaluate supply chain paths.</p>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 6. DISRUPTIONS / ALERTS TAB -->
+                <section class="tab-view" id="tab-disruptions">
+                    <div class="disruption-header-card">
+                        <div class="disruption-banner-content">
+                            <i class="fa-solid fa-triangle-exclamation pulse-warning"></i>
+                            <div>
+                                <h3>Global Supply Chain Threat Matrix</h3>
+                                <p>Simulate localized political crises, weather events, or carrier closures to test the system resilience.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="disruptions-layout">
+                        <!-- Left Side: Controls -->
+                        <div class="grid-card">
+                            <div class="card-header">
+                                <h3>Emergency Disruption Simulator</h3>
+                                <p>Inject global disruption vectors to recalculate pipeline hazards</p>
+                            </div>
+                            <div class="simulation-list">
+                                <div class="simulator-item">
+                                    <div class="sim-details">
+                                        <h5>Monsoon Storm Warning (West Coast Hub)</h5>
+                                        <p>Injects Heavy Storms and flooding across road transits to Mumbai.</p>
+                                    </div>
+                                    <button class="btn btn-warning btn-sm" onclick="simulateDisruption('monsoon')">Trigger Scenario</button>
+                                </div>
+                                
+                                <div class="simulator-item">
+                                    <div class="sim-details">
+                                        <h5>International Crude Price Spike</h5>
+                                        <p>Spikes global fuel prices to $5.50/Gal, impacting profit margins and delay ratios.</p>
+                                    </div>
+                                    <button class="btn btn-warning btn-sm" onclick="simulateDisruption('fuel')">Trigger Scenario</button>
+                                </div>
+
+                                <div class="simulator-item">
+                                    <div class="sim-details">
+                                        <h5>General Port Strike (East Coast Ports)</h5>
+                                        <p>Triggers severe congestion, air freight backlogs, and spikes Chennai transit delay metrics.</p>
+                                    </div>
+                                    <button class="btn btn-danger btn-sm" onclick="simulateDisruption('strike')">Trigger Scenario</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Side: Threat logs -->
+                        <div class="grid-card">
+                            <div class="card-header">
+                                <h3>Active Transit Risk Alerter</h3>
+                                <p>Currently flagged shipping corridors requiring attention</p>
+                            </div>
+                            <div class="active-threats-list" id="active-threats-container">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast-notification" class="toast hidden">
+        <i class="fa-solid fa-circle-check toast-icon"></i>
+        <div class="toast-body">
+            <h5 id="toast-title">Notification</h5>
+            <p id="toast-message">Operation successful.</p>
+        </div>
+    </div>
+
+    <!-- Main JS -->
+    <script src="static/js/mock-data.js"></script>
+    <script src="static/js/charts.js"></script>
+    <script src="static/js/app.js"></script>
+</body>
+</html>

@@ -1,5 +1,5 @@
 /* ==========================================================================
-   AEGIS SUPPLY CHAIN RISK PREDICTOR - CHARTS INTEGRATION
+   AEGIS SUPPLY CHAIN RISK PREDICTOR - CHARTS INTEGRATION (LIGHT THEME)
    ========================================================================== */
 
 // Global chart references
@@ -7,15 +7,15 @@ let delayTrendsChart = null;
 let deliverySuccessChart = null;
 let supplierPerfChart = null;
 
-// Chart JS default configuration for dark theme
+// Chart JS default configuration for light theme
 const chartDefaults = {
-    color: '#94a3b8', // text-secondary
+    color: '#475569', // text-secondary (slate-600)
     font: {
         family: "'Inter', sans-serif",
         size: 11
     },
-    gridColor: 'rgba(56, 189, 248, 0.05)',
-    borderColor: 'rgba(56, 189, 248, 0.1)'
+    gridColor: '#f1f5f9', // light subtle grid
+    borderColor: '#e2e8f0'
 };
 
 function initCharts() {
@@ -29,22 +29,22 @@ function initCharts() {
                 {
                     label: 'Total Shipments',
                     data: [],
-                    borderColor: '#38bdf8', // sky-400
-                    backgroundColor: 'rgba(56, 189, 248, 0.05)',
+                    borderColor: '#0284c7', // sky-600
+                    backgroundColor: 'rgba(2, 132, 199, 0.08)',
                     fill: true,
                     tension: 0.3,
                     borderWidth: 2,
-                    pointBackgroundColor: '#38bdf8'
+                    pointBackgroundColor: '#0284c7'
                 },
                 {
                     label: 'Delayed Orders',
                     data: [],
-                    borderColor: '#ef4444', // red-500
-                    backgroundColor: 'rgba(239, 68, 68, 0.05)',
+                    borderColor: '#dc2626', // red-600
+                    backgroundColor: 'rgba(220, 38, 38, 0.08)',
                     fill: true,
                     tension: 0.3,
                     borderWidth: 2,
-                    pointBackgroundColor: '#ef4444'
+                    pointBackgroundColor: '#dc2626'
                 }
             ]
         },
@@ -80,10 +80,10 @@ function initCharts() {
             datasets: [{
                 data: [0, 0],
                 backgroundColor: [
-                    'rgba(16, 185, 129, 0.85)', // emerald
-                    'rgba(239, 68, 68, 0.85)'   // red
+                    'rgba(22, 163, 74, 0.85)', // emerald-600
+                    'rgba(220, 38, 38, 0.85)'   // red-600
                 ],
-                borderColor: '#131a2b',
+                borderColor: '#ffffff',
                 borderWidth: 3,
                 hoverOffset: 4
             }]
@@ -110,8 +110,8 @@ function initCharts() {
             datasets: [{
                 label: 'Reliability Score (%)',
                 data: [],
-                backgroundColor: 'rgba(99, 102, 241, 0.8)', // indigo-500
-                borderColor: '#6366f1',
+                backgroundColor: 'rgba(79, 70, 229, 0.8)', // indigo-600
+                borderColor: '#4f46e5',
                 borderWidth: 1,
                 borderRadius: 4
             }]
@@ -183,14 +183,14 @@ function updateChartsData(chartsData) {
     
     // Color code bar chart based on scores (High = Emerald, Med = Indigo, Low = Red)
     const backgroundColors = supplierScores.map(score => {
-        if (score >= 90) return 'rgba(16, 185, 129, 0.75)'; // emerald
-        if (score >= 70) return 'rgba(99, 102, 241, 0.75)'; // indigo
-        return 'rgba(239, 68, 68, 0.75)'; // red
+        if (score >= 90) return 'rgba(22, 163, 74, 0.75)'; // emerald
+        if (score >= 70) return 'rgba(79, 70, 229, 0.75)'; // indigo
+        return 'rgba(220, 38, 38, 0.75)'; // red
     });
     const borderColors = supplierScores.map(score => {
-        if (score >= 90) return '#10b981';
-        if (score >= 70) return '#6366f1';
-        return '#ef4444';
+        if (score >= 90) return '#16a34a';
+        if (score >= 70) return '#4f46e5';
+        return '#dc2626';
     });
     
     supplierPerfChart.data.datasets[0].backgroundColor = backgroundColors;

@@ -33,7 +33,7 @@ Designed for manufacturing, logistics, retail, and pharmaceutical industries (su
 - **Backend Web Server**: Python, Flask (Microframework serving REST APIs & HTML pages)
 - **Database Engine**: SQLite (Persistent, relational, embedded database)
 - **AI/ML Infrastructure**: Scikit-Learn, Pandas, Numpy, Joblib (Random Forest Classifier & Regressor pipelines)
-- **Frontend Design**: Semantic HTML5, Vanilla CSS3 (Custom Glassmorphism theme, CSS variables, keyframe animations), Vanilla JavaScript (AJAX, DOM mutation events)
+- **Frontend Design**: Semantic HTML5, Vanilla CSS3 (Clean, accessible light enterprise theme, CSS variables), Vanilla JavaScript (Client-side simulation engine, DOM mutation events)
 - **Visual Libraries**: Chart.js (Interactive canvas charts), FontAwesome (Icon typography)
 
 ---
@@ -57,7 +57,7 @@ supply_chain_risk_prediction/
 │
 └── static/
     ├── css/
-    │   └── style.css     # Glassmorphism dark layout stylesheet
+    │   └── style.css     # Clean light layout stylesheet
     └── js/
         ├── app.js        # Form controls, page transitions, and scenario scripts
         └── charts.js     # Chart.js initialization and data update binds
